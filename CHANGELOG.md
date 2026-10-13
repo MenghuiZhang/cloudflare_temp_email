@@ -6,10 +6,29 @@
   <a href="CHANGELOG_EN.md">English</a>
 </p>
 
-## v1.12.0(main)
+## v1.13.0(main)
 
 ### Features
 
+- feat: |Webhook| 新增邮件过滤规则，统一匹配条件/与/或/非四种节点，支持嵌套、字符串和原生正则匹配、可视化/JSON 编辑及规则检查；移除附件时保留全部原 From 头，缺失或无效时仍移除附件（issue #1155）
+- feat: |用户系统| 邮箱地址管理支持按地址关键字搜索已绑定邮箱，并保持分页结果准确（issue #1156）
+- feat: |AI 识别| 新增 `AI_EXTRACT_MODE`，可显式选择仅用本地规则（`local`）或优先用 Workers AI（`ai`）识别邮件；不填默认使用本地规则，邮件内容不会发送给 AI。**升级注意**：原先依赖 Workers AI 绑定自动启用 AI 识别的部署需设置 `AI_EXTRACT_MODE = "ai"`
+
+### Bug Fixes
+
+- fix: |收件| 黑名单同时检查 SMTP 信封发件人与邮件头 From 的全部邮箱地址，任意一个命中即拒收；独立解析地址，避免正文解析失败或多个发件地址导致漏拦截；地址解析异常时保留原有信封检查
+- fix: |AI 识别| `ai` 模式下地址未命中 AI 提取白名单时只跳过 Workers AI 调用，仍回退到本地规则提取验证码
+
+### Improvements
+
+- feat: |AI 识别| 本地验证码规则增强：同时识别邮件标题，支持验证码在关键词前（如 `116352（动态验证码）`、`ABC123 is your code`）、`G-123456` 前缀、分组 / 空格 / 零宽字符 / 全角数字，新增俄西葡法德意土希伯来语等关键词；排除超过 8 位数字、小数金额、时间、URL 与邮箱地址中的数字、tracking / order / voucher code 及纯字母单词，收紧无关键词时的数字识别，并限制分析长度、消除正则回溯风险
+
+## v1.12.0
+
+### Features
+
+- feat: |Webhook| 测试弹框支持随机邮件或指定邮件 ID，校验请求体及邮箱归属并适配现有前端语言及中英文错误提示
+- feat: |Webhook| 支持无需 S3 的多附件签名链接、纯 URL 与 Markdown 链接列表，签名兼容大小写，绑定本次入库邮件并保留下载文件名，关闭 Webhook 时禁止附件下载（issue #1142）
 - feat: |Worker| 新增 `DISABLE_ADDRESS_UPDATED_AT`，可关闭单地址及用户批量的主动保活刷新，并禁止内置手动及定时不活跃地址清理，降低 D1 写入量
 - feat: |Frontend| 新增 `VITE_DEFAULT_LANG` 构建变量，并支持通过 `index.html` 运行时配置覆盖前端设置
 - feat: |兑换码| 新增角色、发信额度及专属邮箱兑换与管理，完善并发保护和表单提示
